@@ -1,3 +1,7 @@
 *.pyc
 __pycache__
 token.txt
+publish.sh
+build
+dist
+MiniToolkit.egg-info

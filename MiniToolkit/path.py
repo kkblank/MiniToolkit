@@ -1,7 +1,5 @@
 from pathlib import Path
 from shutil import copy, move
-from types import NoneType  # noqa
-
 
 def check_dir_or_path(dir_or_path):
     return Path(dir_or_path)
@@ -42,7 +40,7 @@ def find_labels_in_dir(
     return find_files_in_dir(label_dir, label_suffixes, recurrence)
 
 
-def find_related_file_by_suffixes(path: str | Path, suffixes: list[str] = [".jpeg", ".jpg", ".png", ".json"]) -> Path | NoneType:
+def find_related_file_by_suffixes(path: str | Path, suffixes: list[str] = [".jpeg", ".jpg", ".png", ".json"]) -> Path:
     path = check_dir_or_path(path)
     suffixes = [check_suffix(suffix) for suffix in suffixes]
     parent = path.parent

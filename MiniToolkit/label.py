@@ -1,15 +1,14 @@
 import json
 from pathlib import Path
-from typing import Optional, Union
 
 import cv2
 import numpy as np
 
-from .mask import polygon_to_box, polygon_to_mask
-from .path import check_dir_or_path
+from MiniToolkit.mask import polygon_to_box, polygon_to_mask
+from MiniToolkit.path import check_dir_or_path
 
 
-def just_load_label(label_path: Union[str, Path]):
+def just_load_label(label_path: str | Path):
     with open(label_path, "r", encoding="utf-8") as file:
         loaded_label = json.load(file)
 
@@ -66,7 +65,7 @@ def convert_label_to_instances(
 def convert_instances_to_label(
     instances: list[dict],
     classes_id_to_name: dict,
-    image_name: Union[str, Path],
+    image_name: str | Path,
     image_height: int,
     image_width: int,
 ):
@@ -101,9 +100,9 @@ def convert_instances_to_label(
 
 
 def check_available(
-    label_path: Union[str, Path],
-    available_labels: Union[list, dict] = ["wanglei", "molei"],
-    not_available_labels: Union[list, dict] = ["null", "blur"],
+    label_path: str | Path,
+    available_labels: list | dict = ["wanglei", "molei"],
+    not_available_labels: list | dict = ["null", "blur"],
 ) -> bool:
     available = False
     label_path = check_dir_or_path(label_path)
@@ -121,7 +120,7 @@ def check_available(
 
 
 def get_shapes_from_label(
-    label_path: Union[str, Path],
+    label_path: str | Path,
     label_to_id: dict,
     image_height: int,
     image_width: int,
@@ -206,10 +205,10 @@ def get_mask_from_label(
 def get_polygons_from_label(
     label_path: Path,
     label_to_id: dict,
-    image_height: Optional[int] = None,
-    image_width: Optional[int] = None,
-    cls_exclusion_list: Optional[list] = [],
-    attr_exclusion_list: Optional[list] = [],
+    image_height: int = None,
+    image_width: int = None,
+    cls_exclusion_list: list = [],
+    attr_exclusion_list: list = [],
     encoding: str = "utf-8",
     id_map=None,
 ):
@@ -253,7 +252,7 @@ def get_polygons_from_label(
 
 def save_label_to_json(
     label: dict,
-    save_path: Union[str, Path],
+    save_path: str | Path,
     encoding: str = "utf-8",
     ensure_ascii: bool = False,
     indent: int = 2,
@@ -275,7 +274,7 @@ def save_label_to_json(
 
 def save_label_to_txt(
     label: list,
-    save_path: Union[str, Path],
+    save_path: str | Path,
     encoding: str = "utf-8",
 ):  # yolo format polygons
     save_path = check_dir_or_path(save_path)
