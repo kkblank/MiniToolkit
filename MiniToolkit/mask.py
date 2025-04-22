@@ -2,7 +2,6 @@ from typing import Union
 
 import cv2
 import numpy as np
-import torch
 
 # def polygon_to_mask(polygon, image_height, image_width):
 #     mask = np.zeros((image_height, image_width), dtype=np.uint8)
@@ -35,8 +34,6 @@ def mask_to_polygons(
     max_point_threshold: int = 35,
     approx_tolerance: float = 0.001,
 ) -> list[np.array]:
-    if isinstance(mask, torch.Tensor):
-        mask = mask.cpu().numpy()
     mask = mask.astype(bool)
     contours = cv2.findContours(mask.astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)[0]
     polygons = []
@@ -66,13 +63,11 @@ def mask_to_polygons(
 
 
 def mask_to_polygon(
-    mask: Union[torch.Tensor, np.ndarray],
+    mask: np.ndarray,
     strategy: str = "largest",
     approx: bool = True,
     approx_tolerance: float = 0.001,
 ):
-    if isinstance(mask, torch.Tensor):
-        mask = mask.cpu().numpy()
 
     # contours = cv2.findContours(mask.astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[0]
     contours = cv2.findContours(mask.astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)[0]
@@ -97,27 +92,18 @@ def mask_to_polygon(
     return polygon
 
 
-def polygon_to_mask(
-    polygon: np.ndarray,
-    height: int,
-    width: int,
-    to_tensor: bool = False,
-):
+def polygon_to_mask(polygon: np.ndarray, height: int, width: int):
     # polygon的形状[x,y]
     # mask的形状[h,w]
     mask = np.zeros((height, width), dtype=np.uint8)
     polygon = np.array(polygon, dtype=int)
     cv2.fillConvexPoly(mask, polygon, 1)
-    mask = torch.from_numpy(mask.astype(bool)) if to_tensor else mask.astype(bool)
+    mask = mask.astype(bool)
 
     return mask
 
 
-def polygon_to_box(
-    polygon: np.ndarray,
-    height: int,
-    width: int,
-):
+def polygon_to_box(polygon: np.ndarray, height: int, width: int):
     x, y = polygon.T  # segment xy
     inside = (x >= 0) & (y >= 0) & (x <= width) & (y <= height)
     x, y = x[inside], y[inside]
@@ -173,11 +159,7 @@ def calculate_iou(refer, query):
     return iou
 
 
-def calculate_iou_by_mask(
-    mask1: np.ndarray,
-    mask2: np.ndarray,
-    eps: float = 1e-7,
-) -> float:
+def calculate_iou_by_mask(mask1: np.ndarray, mask2: np.ndarray, eps: float = 1e-7) -> float:
     """标准的iou比较"""
     # Mask shape:[height, width]
     intersection = np.sum(np.logical_and(mask1, mask2))
@@ -186,11 +168,7 @@ def calculate_iou_by_mask(
     return iou
 
 
-def calculate_ios_by_mask(
-    mask1: np.ndarray[bool],
-    mask2: np.ndarray[bool],
-    eps: float = 1e-7,
-) -> float:
+def calculate_ios_by_mask(mask1: np.ndarray[bool], mask2: np.ndarray[bool], eps: float = 1e-7) -> float:
     """交集/自身面积
     计算自身被召回的比例"""
     # Mask shape:[height, width]
@@ -200,11 +178,7 @@ def calculate_ios_by_mask(
     return ios
 
 
-def calculate_iou_by_masks(
-    masks1: np.ndarray,
-    masks2: np.ndarray,
-    eps: float = 1e-7,
-) -> np.ndarray:
+def calculate_iou_by_masks(masks1: np.ndarray, masks2: np.ndarray, eps: float = 1e-7) -> np.ndarray:
     # Mask shape:[NorM, height, width]
     if (masks1.size and masks2.size) == 0:
         return 0
@@ -219,11 +193,7 @@ def calculate_iou_by_masks(
     return iou
 
 
-def calculate_iou_by_box(
-    box1: np.ndarray,
-    box2: np.ndarray,
-    eps: float = 1e-7,
-) -> float:
+def calculate_iou_by_box(box1: np.ndarray, box2: np.ndarray, eps: float = 1e-7) -> float:
     # Box format:[xmin,ymin,xmax,ymax]
     box1_xmin, box1_ymin, box1_xmax, box1_ymax = box1
     box2_xmin, box2_ymin, box2_xmax, box2_ymax = box2
