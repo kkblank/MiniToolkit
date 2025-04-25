@@ -15,10 +15,7 @@ def just_load_label(label_path: str | Path):
     return loaded_label
 
 
-def convert_label_to_instances(
-    label: dict,
-    classes_name_to_id: dict,
-):
+def convert_label_to_instances(label: dict, classes_name_to_id: dict):
     image_height = label["imageHeight"]
     image_width = label["imageWidth"]
 
@@ -36,11 +33,12 @@ def convert_label_to_instances(
         instances.append(
             {
                 "class_id": class_id,
-                # "class_name": class_name,
+                "label": class_name,
                 "polygon": polygon,
                 "box": box,
                 "mask": mask,
-                # "area": np.sum(mask),
+                "group_id": shape.get("group_id", None),
+                "area": np.sum(mask),
             }
         )
 

@@ -55,14 +55,14 @@ def find_related_file_by_suffixes(path: str | Path, suffixes: list[str] = [".jpe
 def find_label_path_from_image(
     image_path: str | Path,
     label_suffixes: list[str] = [".json"],
-) -> Path | NoneType:
+) -> Path:
     return find_related_file_by_suffixes(image_path, label_suffixes)
 
 
 def find_image_path_from_label(
     label_path: str | Path,
     image_suffixes: list[str] = [".jpeg", "jpg", "png"],
-) -> Path | NoneType:
+) -> Path:
     return find_related_file_by_suffixes(label_path, image_suffixes)
 
 
