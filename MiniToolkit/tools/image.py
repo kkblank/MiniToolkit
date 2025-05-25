@@ -12,7 +12,7 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 # from skimage.metrics import normalized_root_mse as nrmse
 # from skimage.metrics import structural_similarity as ssim
 
-from MiniToolkit.path import check_dir_or_path
+from MiniToolkit.tools.path import check_dir_or_path
 
 
 # PIL -> cv2

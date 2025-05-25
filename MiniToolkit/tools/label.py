@@ -4,8 +4,8 @@ from pathlib import Path
 import cv2
 import numpy as np
 
-from MiniToolkit.mask import polygon_to_box, polygon_to_mask
-from MiniToolkit.path import check_dir_or_path
+from MiniToolkit.tools.mask import polygon_to_box, polygon_to_mask
+from MiniToolkit.tools.path import check_dir_or_path
 
 
 def just_load_label(label_path: str | Path):
@@ -20,16 +20,23 @@ def convert_label_to_instances(label: dict, classes_name_to_id: dict):
     image_width = label["imageWidth"]
 
     instances = []
-    # one_hot_mask = np.zeros((len(names_to_id), image_height, image_width), dtype=bool)
-
     for shape in label["shapes"]:
         class_name = shape["label"]
         if class_name not in classes_name_to_id:
             continue
         class_id = classes_name_to_id[class_name]
-        polygon = np.array(shape["points"], dtype=np.int32)
-        box = polygon_to_box(polygon, image_height, image_width)
+        if len(shape["points"]) == 1:
+            print("跳过标注点数为1的实例")
+            continue
+        elif len(shape["points"]) == 2: # box分支
+            box = np.array(shape["points"], dtype=np.int32).reshape((-1))
+            polygon = np.array([[box[0], box[1]], [box[2], box[1]], [box[2], box[3]], [box[0], box[3]]])
+        else: # polygon分支
+            polygon = np.array(shape["points"], dtype=np.int32)
+            box = polygon_to_box(polygon, image_height, image_width)
+
         mask = polygon_to_mask(polygon, image_height, image_width)
+
         instances.append(
             {
                 "class_id": class_id,
@@ -43,21 +50,6 @@ def convert_label_to_instances(label: dict, classes_name_to_id: dict):
         )
 
     return instances
-
-    # classes = np.array([instance["class_id"] for instance in instances])
-    # boxes = np.array([instance["box"] for instance in instances])
-    # masks = np.array([instance["mask"] for instance in instances])
-
-    # results = {
-    #     # "instances": instances, # class_id, -class_name, mask, -area, -polygon, -box
-    #     "classes": classes,
-    #     "boxes": boxes,
-    #     "masks": masks,
-    #     "one_hot_mask": one_hot_mask,
-    # }
-
-    # # return instances, one_hot_mask
-    # return results
 
 
 def convert_instances_to_label(
@@ -74,12 +66,16 @@ def convert_instances_to_label(
             continue
         class_name = classes_id_to_name[class_id]
         polygon = instance["polygon"].tolist()
+        if len(polygon) < 3: # box分支
+            shape_type = "rectangle"
+        else: # 多边形分支
+            shape_type = "polygon"
         shapes.append(
             {
                 "label": class_name,
                 "points": polygon,
                 "group_id": None,
-                "shape_type": "polygon",
+                "shape_type": shape_type,
                 "flags": {},
             }
         )
@@ -93,8 +89,8 @@ def convert_instances_to_label(
         "imageHeight": image_height,
         "imageWidth": image_width,
     }
-
     return label
+
 
 
 def check_available(
