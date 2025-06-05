@@ -24,7 +24,7 @@ version = { attr = "MiniToolkit.__version__" }
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["MiniToolkit"]
+include = ["MiniToolkit","MiniToolkit.*"]
 #exclude = ["MiniToolkit.augment"]
 
 [project.scripts]

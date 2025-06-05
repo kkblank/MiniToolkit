@@ -46,6 +46,7 @@ def convert_label_to_instances(label: dict, classes_name_to_id: dict):
                 "mask": mask,
                 "group_id": shape.get("group_id", None),
                 "area": np.sum(mask),
+                "conf":shape.get("conf", 0) or shape.get("score", 0),
             }
         )
 
@@ -76,6 +77,7 @@ def convert_instances_to_label(
                 "points": polygon,
                 "group_id": None,
                 "shape_type": shape_type,
+                "conf": instance.get("conf", 0) or instance.get("score", 0),
                 "flags": {},
             }
         )
